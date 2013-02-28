@@ -190,7 +190,7 @@ public class main implements EntryPoint {
 				final VerticalPanel vPanel;
 				
 				vPanel = new VerticalPanel();
-				//vPanel.setStyleName("vPanel");
+				vPanel.setStyleName("vPanel");
 				vPanel.setSize("100%", "100%");
 				vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 				//vPanel.setBorderWidth(2);

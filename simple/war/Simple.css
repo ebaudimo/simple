@@ -37,6 +37,11 @@ h1 {
 	background-color: gray;	
 }
 
+.vPanel {
+	max-height: 100px;
+	max-width: 100px;
+}
+
 .front {
 	z-index: 1;
 }
