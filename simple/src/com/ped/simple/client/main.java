@@ -237,7 +237,7 @@ public class main implements EntryPoint {
 		
 		//au moment du survol
 		l.addMouseOverHandler(new MouseOverHandler() {
-			
+			//plop
 			@Override
 			public void onMouseOver(MouseOverEvent event) {
 				// TODO Auto-generated method stub
