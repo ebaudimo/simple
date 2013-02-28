@@ -193,7 +193,6 @@ public class main implements EntryPoint {
 				vPanel.setStyleName("vPanel");
 				vPanel.setSize("100%", "100%");
 				vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-				//vPanel.setBorderWidth(2);
 				
 				createBackPanel(vPanel);
 				
@@ -237,11 +236,8 @@ public class main implements EntryPoint {
 		
 		//au moment du survol
 		l.addMouseOverHandler(new MouseOverHandler() {
-			//plop
 			@Override
 			public void onMouseOver(MouseOverEvent event) {
-				// TODO Auto-generated method stub
-				//DOM.setStyleAttribute(l.getElement(), "backgroundColor", "red");
 				l.setStyleDependentName("overPanel", true);
 			}
 		});
@@ -250,9 +246,6 @@ public class main implements EntryPoint {
 			
 			@Override
 			public void onMouseOut(MouseOutEvent event) {
-				// TODO Auto-generated method stub
-				//DOM.setStyleAttribute(l.getElement(), "backgroundColor", "white");
-				//l.setStyleName(l.getStyleName());
 				l.removeStyleDependentName("overPanel");
 			}
 		});
