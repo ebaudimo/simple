@@ -1,6 +1,8 @@
 package com.ped.simple.client;
 
+
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dev.shell.remoteui.MessageTransport.RequestException;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.DragEndEvent;
 import com.google.gwt.event.dom.client.DragEndHandler;
@@ -14,11 +16,16 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MouseListener;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -38,7 +45,37 @@ public class main implements EntryPoint {
 	private Label itemCP;
 	
 	public void onModuleLoad() {
-		RootPanel rootPanel = RootPanel.get();
+		final RootPanel rootPanel = RootPanel.get();
+		
+		//test recup un teaching
+		final RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, "http://localhost:8080/rest/service/read/teachings/week/1/");
+		try {
+			Request request = builder.sendRequest("1362038400", new RequestCallback() {
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					// TODO Auto-generated method stub
+					PopupPanel pp = new PopupPanel();
+					
+					
+					
+					pp.add(new Label(response.getText()));
+					rootPanel.add(pp);
+					
+					pp.show();
+					
+				}
+				
+				@Override
+				public void onError(Request request, Throwable exception) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+		} catch (com.google.gwt.http.client.RequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Tree tree = new Tree();
 		tree.setStyleName("dialogVPanel");
