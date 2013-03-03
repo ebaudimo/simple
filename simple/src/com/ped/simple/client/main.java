@@ -2,8 +2,9 @@ package com.ped.simple.client;
 
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.dev.shell.remoteui.MessageTransport.RequestException;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DragEndEvent;
 import com.google.gwt.event.dom.client.DragEndHandler;
 import com.google.gwt.event.dom.client.DragOverEvent;
@@ -20,19 +21,17 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.MouseListener;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.ped.simple.client.Teaching;
 import com.ped.simple.client.TeachingType;
+import com.google.gwt.user.client.ui.Button;
 
 public class main implements EntryPoint {
 
@@ -47,40 +46,76 @@ public class main implements EntryPoint {
 	public void onModuleLoad() {
 		final RootPanel rootPanel = RootPanel.get();
 		
-		//test recup un teaching
-		final RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, "http://localhost:8080/rest/service/read/teachings/week/1/");
-		try {
-			Request request = builder.sendRequest("1362038400", new RequestCallback() {
+		
+		final Button myButton = new Button("Test");
+		rootPanel.add(myButton, 25, 353);
+		myButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				//test recup un teaching
+				String url = "proxy.jsp?url=http://localhost:8080/rest/service/read/teachings/week/1/1362038400";
+				//String url = "proxy.jsp?url=http://localhost:8080/rest/service/read/teachings/module/1";
+				final RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
+				
+				try {
+					builder.sendRequest(null, new RequestCallback() {
 
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					// TODO Auto-generated method stub
-					PopupPanel pp = new PopupPanel();
-					
-					
-					
-					pp.add(new Label(response.getText()));
-					rootPanel.add(pp);
-					
-					pp.show();
-					
+						@Override
+						public void onResponseReceived(Request request, Response response) {
+							// TODO Auto-generated method stub
+								if(response.getStatusCode() == 200) {
+									Window.alert(response.getText());
+									//Teaching t = (Teaching) JSON.parse(response.getText());
+									//myButton.setText(t.getTeacher());
+								}
+						}
+						
+						@Override
+						public void onError(Request request, Throwable exception) {
+							// TODO Auto-generated method stub
+							Window.alert("Erreur");
+						}
+					});
+				} catch (com.google.gwt.http.client.RequestException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 				
-				@Override
-				public void onError(Request request, Throwable exception) {
-					// TODO Auto-generated method stub
-					
-				}
-			});
-		} catch (com.google.gwt.http.client.RequestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			}
+		});
+		
 		
 		Tree tree = new Tree();
 		tree.setStyleName("dialogVPanel");
 		rootPanel.add(tree, 1, 1);
 		tree.setSize("50px", "100px");
+		
+		final Label myLabel = new Label("From ?");
+		rootPanel.add(myLabel, 34, 262);
+		
+		tree.addDomHandler(new DragOverHandler() {
+			public void onDragOver(DragOverEvent event) {
+			}
+		}, DragOverEvent.getType());
+		tree.addDomHandler(new DropHandler() {
+			@Override
+			public void onDrop(DropEvent event) {
+				// TODO Auto-generated method stub
+				String origin = event.getData("source");
+				if(origin.compareTo("tree") == 0) {
+					myLabel.setText("From tree");
+				}
+				else if (origin.compareTo("table") == 0) {
+					myLabel.setText("From table");
+				}
+				else {
+					myLabel.setText("Error");
+				}
+			}
+		}, DropEvent.getType());
+		
 		
 		itemTAP = new Label("TAP");
 		itemTAP.getElement().setPropertyObject("teachingObject", TAP);
@@ -219,7 +254,6 @@ public class main implements EntryPoint {
 		h6.setStyleName("notEditable");
 		flexTable.setWidget(0, 6, h6);
 		
-		
 		//grid part
 		for (int i=1; i<=5; i++) { //row
 			for (int j=1; j<=6; j++) { //column
@@ -280,7 +314,6 @@ public class main implements EntryPoint {
 		});
 		
 		l.addMouseOutHandler(new MouseOutHandler() {
-			
 			@Override
 			public void onMouseOut(MouseOutEvent event) {
 				l.removeStyleDependentName("overPanel");
@@ -290,6 +323,7 @@ public class main implements EntryPoint {
 		//au moment ou on le saisit
 		l.addDragStartHandler(new DragStartHandler() {
 			public void onDragStart(DragStartEvent event) {
+				event.setData("source", "table");
 				event.setData("css", l.getStyleName());
 				event.setData("name", ((Teaching) ((Label) event.getSource()).getElement().getPropertyObject("teachingObject")).getTeacher());
 				event.setData("id", String.valueOf(((Teaching) l.getElement().getPropertyObject("teachingObject")).getModule()));
@@ -300,14 +334,15 @@ public class main implements EntryPoint {
 		//on a deplace l'objet
 		l.addDragEndHandler(new DragEndHandler() {
 			public void onDragEnd(DragEndEvent event) {
-					
 				if(parent.remove(l)) {
 					if(parent.getWidgetCount() == 0) {
 						createBackPanel(parent);
 					}
-				}	
+				}
 			}
 		});
+		
+		//l.addD
 	} //end addEventLabel
 
 	public void createBackPanel(final VerticalPanel parent) {
@@ -329,6 +364,7 @@ public class main implements EntryPoint {
 		
 		item.addDragStartHandler(new DragStartHandler() {
 			public void onDragStart(DragStartEvent event) {
+				event.setData("source", "tree");
 				event.setData("css", "module3");
 				event.setData("name", ((Teaching) item.getElement().getPropertyObject("teachingObject")).getTeacher());
 				event.setData("id", String.valueOf(((Teaching) item.getElement().getPropertyObject("teachingObject")).getModule()));
@@ -338,5 +374,4 @@ public class main implements EntryPoint {
 		
 		return item;
 	}
-	
 }
